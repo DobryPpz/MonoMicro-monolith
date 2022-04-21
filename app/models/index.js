@@ -1,0 +1,10 @@
+const mongoose = require("mongoose");
+mongoose.Promise = global.Promise;
+const db = {};
+db.mongoose = mongoose;
+db.user = require("./user");
+db.bulletColor = require("./bulletcolor");
+db.deathSound = require("./deathsound");
+db.shootSound = require("./shootsound");
+db.skinColor = require("./skincolor");
+module.exports = db;

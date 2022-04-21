@@ -1,4 +1,4 @@
-1. Napisać model przechowywania użytkowników ()
+1. Napisać model przechowywania użytkowników (x)
 2. Napisać rejestrację i logowanie z jwt ()
 3. Napisać komponent game roomu(dołączanie graczy do gameroomu, ich interakcję i widok) ()
 4. Napisać model tabeli wyników graczy ()

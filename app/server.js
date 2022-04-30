@@ -17,6 +17,7 @@ app.set("view engine","ejs");
 app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
+app.use(express.static(path.join(__dirname,"..","grafika")));
 app.use(express.static(path.join(__dirname,"views","scripts")));
 app.use(express.static(path.join(__dirname,"styles")));
 app.use(express.static(path.join(__dirname,"bulletcolors")));

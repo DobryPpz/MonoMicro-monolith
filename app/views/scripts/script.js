@@ -11,10 +11,11 @@ let token;
 
 import { drawMenu } from "./scenes.js";
 
-function getCanvasData(){
+export function getCanvasData(){
     canvas = document.getElementById("canv");
+    canvas.width = 800;
+    canvas.height = 600;
     context = canvas.getContext("2d");
-    canvas.style.backgroundColor = "#002774";
 }
 
 signupButton.addEventListener("click",e => {

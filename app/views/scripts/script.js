@@ -7,7 +7,7 @@ const passwordSignin = document.getElementById("passwordsignin");
 const message = document.getElementById("message");
 export let canvas;
 export let context;
-let token;
+export let token;
 
 import { drawMenu } from "./scenes.js";
 

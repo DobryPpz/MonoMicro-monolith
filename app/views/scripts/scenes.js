@@ -1,5 +1,5 @@
 import { canvas, context } from "./script.js";
-import { logoutEvent } from "./menuevents.js";
+import { logoutEvent, scoreEvent } from "./menuevents.js";
 
 export let canvasEvents = [];
 
@@ -37,6 +37,8 @@ export function drawMenu(){
             wyniki.width*0.4,
             wyniki.height*0.4);
     };
+    canvas.addEventListener("click",scoreEvent);
+    canvasEvents.push(scoreEvent);
     wyloguj.src = "WYLOGUJ.png";
     wyloguj.onload = () => {
         context.drawImage(wyloguj,

@@ -7,7 +7,6 @@ const scoreRoutes = require("./routes/scoreroutes");
 const settingsRoutes = require("./routes/settingsroutes");
 const authControllers = require("./controllers/authcontrollers");
 const gameControllers = require("./controllers/gamecontrollers");
-const scoreControllers = require("./controllers/scorecontrollers");
 const settingsControllers = require("./controllers/settingscontrollers");
 const authJwt = require("./middleware/authjwt");
 require("dotenv").config();

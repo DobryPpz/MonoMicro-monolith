@@ -4,20 +4,48 @@ const path = require("path");
 const db = require("../models/index");
 const User = db.user;
 
-router.get("/",(req,res) => {
+router.get("/", async (req,res) => {
     res.sendFile(path.join(__dirname,"..","views","playerscorepage.html"));
 });
 
-router.get("/decreasing",(req,res) => {
-
+router.get("/decreasing", async (req,res) => {
+    let users = await User.find({});
+    users.sort((a,b) => b["level"]-a["level"]);
+    users = users.slice(0,10);
+    users = users.map(u => {
+        return {
+            "username": u["username"],
+            "level": u["level"]
+        };
+    });
+    return res.send(users);
 });
 
-router.get("/increasing",(req,res) => {
-
+router.get("/increasing",async (req,res) => {
+   let users = await User.find({});
+   users.sort((a,b) => a["level"]-b["level"]);
+   users = users.slice(0,10);
+   users = users.map(u => {
+       return {
+           "username": u["username"],
+           "level": u["level"]
+       };
+   });
+   return res.send(users);
 });
 
-router.get("/player",(req,res) => {
-
+router.get("/player", async (req,res) => {
+    let users = await User.find({});
+    users.sort((a,b) => b["level"]-a["level"]);
+    let player = req.user;
+    for(let i=0;i<users.length;i++){
+        if(users[i]["username"] == player["username"]){
+            return res.send({
+                "username": player["username"],
+                "rank": i+1
+            });
+        }
+    }
 });
 
 module.exports = router;

@@ -31,7 +31,6 @@ export function logoutEvent(e){
 }
 
 export function scoreEvent(e){
-    console.log("chciano wejść do score");
     let position = getMousePosition(e);
     if(position.x >= canvas.width/2-buttonWidth/2 &&
         position.x <= canvas.width/2+buttonWidth/2 &&
@@ -71,6 +70,61 @@ export function scoreEvent(e){
                     document.body = doc.body;
                     getCanvasData();
                     drawMenu();
+                });
+            });
+            decreasingButton.addEventListener("click",e => {
+                fetch("http://localhost:8000/score/decreasing",{
+                    method: "GET",
+                    headers: {
+                        "x-access-token": token
+                    }
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    scoreTable.innerHTML = "";
+                    for(let i=0;i<data.length;i++){
+                        let li = document.createElement("li");
+                        li.innerText = `${i+1}: ${data[i]["username"]}  level: ${data[i]["level"]}`;
+                        scoreTable.append(li);
+                    }
+                });
+            });
+            playerScoreButton.addEventListener("click",e => {
+                fetch("http://localhost:8000/score/player",{
+                    method: "GET",
+                    headers: {
+                        "x-access-token": token
+                    }
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    scoreTable.innerHTML = "";
+                    let li = document.createElement("li");
+                    li.innerText = `${data["username"]} Pozycja w rankingu: ${data["rank"]}`;
+                    scoreTable.append(li);
+                });
+            });
+            increasingButton.addEventListener("click",e => {
+                fetch("http://localhost:8000/score/increasing",{
+                    method: "GET",
+                    headers: {
+                        "x-access-token": token
+                    }
+                })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    scoreTable.innerHTML = "";
+                    for(let i=0;i<data.length;i++){
+                        let li = document.createElement("li");
+                        li.innerText = `${i+1}: ${data[i]["username"]}  level: ${data[i]["level"]}`;
+                        scoreTable.append(li);
+                    }
                 });
             });
         });

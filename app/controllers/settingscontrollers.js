@@ -1,44 +1,22 @@
+const db = require("../models/index");
+const User = db.user;
+const path = require("path");
 
-
-const getSkins = async (req,res) => {
-
+const getSettings = async (req,res) => {
+    res.sendFile(path.join(__dirname,"..","views","settingspage.html"));
 }
 
-const getBullets = async (req,res) => {
-
-}
-
-const getShootSounds = async (req,res) => {
-
-}
-
-const getDeathSounds = async (req,res) => {
-
-}
-
-const setSkin = async (req,res) => {
-
-}
-
-const setBullet = async (req,res) => {
-
-}
-
-const setShootSound = async (req,res) => {
-
-}
-
-const setDeathSound = async (req,res) => {
-
+const saveSettings = async (req,res) => {
+    const u = await User.findOne({"username": req.user["username"]});
+    u["skincolor"] = req.body["newskincolor"];
+    u["bulletcolor"] = req.body["newbulletcolor"];
+    u["deathsound"] = req.body["newdeathsound"];
+    u["shootsound"] = req.body["newshootsound"];
+    await u.save();
+    return res.send({message: "Ustawienia zmienione pomyślnie"});
 }
 
 module.exports = {
-    getSkins,
-    getBullets,
-    getShootSounds,
-    getDeathSounds,
-    setSkin,
-    setBullet,
-    setShootSound,
-    setDeathSound
+    getSettings,
+    saveSettings
 };

@@ -5,9 +5,7 @@ const path = require("path");
 const authRoutes = require("./routes/authroutes");
 const scoreRoutes = require("./routes/scoreroutes");
 const settingsRoutes = require("./routes/settingsroutes");
-const authControllers = require("./controllers/authcontrollers");
-const gameControllers = require("./controllers/gamecontrollers");
-const settingsControllers = require("./controllers/settingscontrollers");
+const gameRoutes = require("./routes/gameroutes");
 const authJwt = require("./middleware/authjwt");
 require("dotenv").config();
 require("ejs");
@@ -31,15 +29,14 @@ db.mongoose.connect("mongodb://localhost/monomicromonolith",() => {
 app.get("/",(req,res) => {
     res.sendFile(path.join(__dirname,"views","startpage.html"));
 });
-app.use("/auth",authRoutes);
-app.get("/menu",authJwt.verifyToken,(req,res) => {
+app.get("/menu",authJwt.verifyToken, (req,res) => {
     console.log("verified user ",req.user);
     res.sendFile(path.join(__dirname,"views","menupage.html"));
-    //res.render("menupage");
 });
-app.post("/game",authJwt.verifyToken,gameControllers.findGame);
+app.use("/auth",authRoutes);
+app.post("/game",authJwt.verifyToken,gameRoutes);
 app.use("/score",authJwt.verifyToken,scoreRoutes);
-app.use("/setting",authJwt.verifyToken,settingsRoutes);
+app.use("/settings",authJwt.verifyToken,settingsRoutes);
 app.listen(8000,() => {
     console.log("The app is running on port 8000");
 });

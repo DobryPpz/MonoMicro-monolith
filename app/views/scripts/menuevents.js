@@ -24,6 +24,7 @@ export function logoutEvent(e){
         .then(data => {
             let doc = new DOMParser().parseFromString(data,"text/html");
             document.body = doc.body;
+            clearEverything();
             clearToken();
             setUpPage();
         });

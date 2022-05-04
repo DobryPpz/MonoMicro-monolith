@@ -21,7 +21,6 @@ const signup = async (req,res) => {
         });
         await user.save();
         return res.send({message: "Zarejestrowano pomyślnie"});
-        //res.render("startpage",{message: "Zarejestrowano pomyślnie"});
     }
 }
 

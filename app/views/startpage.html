@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
     <title>MonoMicro - monolith</title>
+    <script defer src="http://localhost:5050/socket.io/socket.io.js"></script>
+    <script defer type="module" src="script.js"></script>
 </head>
 <body>
     <p class="headers" id="message"></p>
@@ -20,6 +22,5 @@
         <span class="auth">Hasło</span><input id="passwordsignin" type="password">
         <button id="signin">Zaloguj</button>
     </div>
-    <script type="module" src="script.js"></script>
 </body>
 </html>

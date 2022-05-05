@@ -4,6 +4,8 @@ export let token;
 
 import { drawMenu } from "./scenes.js";
 
+export const socket = io("http://localhost:5050");
+
 export function clearToken(){
     token = "";
 }

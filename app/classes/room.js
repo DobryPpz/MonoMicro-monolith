@@ -91,6 +91,18 @@ class Room{
             if(Math.sqrt((h.x-this.player2.x)**2+(h.y-this.player2.y)**2) <= 20){
                 this.player2.hp = Math.min(this.player2.hp+40,500);
             }
+            if(h.x <= 0){
+                h.dx *= -1;
+            }
+            if(h.x >= 800){
+                h.dx *= -1;
+            }
+            if(h.y <= 0){
+                h.dy *= -1;
+            }
+            if(h.y >= 600){
+                h.dy *= -1;
+            }
         }
         for(let a of this.armorAdders){
             if(Math.sqrt((a.x-this.player1.x)**2+(a.y-this.player1.y)**2) <= 20){
@@ -98,6 +110,18 @@ class Room{
             }
             if(Math.sqrt((a.x-this.player2.x)**2+(a.y-this.player2.y)**2) <= 20){
                 this.player2.armor = Math.min(this.player2.armor+20,100);
+            }
+            if(a.x <= 0){
+                a.dx *= -1;
+            }
+            if(a.x >= 800){
+                a.dx *= -1;
+            }
+            if(a.y <= 0){
+                a.dy *= -1;
+            }
+            if(a.y >= 600){
+                a.dy *= -1;
             }
         }
         for(let b of this.bullets1){
@@ -117,8 +141,8 @@ class Room{
                     clearInterval(this.intervalid);
                     clearInterval(this.spawnAddersId);
                     delete gamecontrollers.rooms[this.code];
-                    io.to(this.player1.socketid).emit("end-game");
-                    io.to(this.player2.socketid).emit("end-game");
+                    io.to(this.player1.socketid).emit("end-game", this.code);
+                    io.to(this.player2.socketid).emit("end-game", this.code);
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){
@@ -142,8 +166,8 @@ class Room{
                     clearInterval(this.intervalid);
                     clearInterval(this.spawnAddersId);
                     delete gamecontrollers.rooms[this.code];
-                    io.to(this.player1.socketid).emit("end-game");
-                    io.to(this.player2.socketid).emit("end-game");
+                    io.to(this.player1.socketid).emit("end-game", this.code);
+                    io.to(this.player2.socketid).emit("end-game", this.code);
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){

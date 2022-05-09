@@ -7,6 +7,7 @@ const scoreRoutes = require("./routes/scoreroutes");
 const settingsRoutes = require("./routes/settingsroutes");
 const gameRoutes = require("./routes/gameroutes");
 const authJwt = require("./middleware/authjwt");
+const User = require("./models/user");
 
 require("dotenv").config();
 require("ejs");
@@ -35,7 +36,7 @@ app.get("/menu",authJwt.verifyToken, (req,res) => {
     res.sendFile(path.join(__dirname,"views","menupage.html"));
 });
 app.use("/auth",authRoutes);
-app.post("/game",authJwt.verifyToken,gameRoutes);
+app.use("/game",authJwt.verifyToken,gameRoutes);
 app.use("/score",authJwt.verifyToken,scoreRoutes);
 app.use("/settings",authJwt.verifyToken,settingsRoutes);
 app.listen(8000,() => {

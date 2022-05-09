@@ -8,6 +8,9 @@ io.on("connection", socket => {
     socket.on("join-room", data => {
         socket.join(data);
     });
+    socket.on("leave-room", data => {
+        socket.leave(data);
+    });
 });
 
 module.exports = {

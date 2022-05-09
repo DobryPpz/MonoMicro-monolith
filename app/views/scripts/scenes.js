@@ -1,6 +1,7 @@
 import { canvas, context } from "./script.js";
 import { logoutEvent, scoreEvent } from "./menuevents.js";
 import { settingsEvent } from "./settingsevents.js";
+import { gameEvent } from "./gameevents.js";
 
 export let canvasEvents = [];
 
@@ -22,6 +23,8 @@ export function drawMenu(){
         buttonWidth = graj.width*0.4;
         buttonHeight = graj.height*0.4; 
     };
+    canvas.addEventListener("click",gameEvent);
+    canvasEvents.push(gameEvent);
     ustawienia.src = "USTAWIENIA.png";
     ustawienia.onload = () => {
         context.drawImage(ustawienia,

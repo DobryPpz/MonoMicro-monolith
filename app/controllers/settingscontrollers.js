@@ -13,7 +13,7 @@ const saveSettings = async (req,res) => {
     u["deathsound"] = req.body["newdeathsound"];
     u["shootsound"] = req.body["newshootsound"];
     await u.save();
-    return res.send({message: "Ustawienia zmienione pomyślnie"});
+    return res.send(u);
 }
 
 module.exports = {

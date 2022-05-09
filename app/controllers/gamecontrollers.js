@@ -49,7 +49,7 @@ const createRoom = async (player1,player2) => {
     io.to(player2socket).emit("room-ready",roomId);
 }
 
-const findPair = async () => {
+const findPair = () => {
     for(let q in queue){
         if(queue[q].length >= 2){
             let pair = queue[q].splice(0,2);
@@ -60,15 +60,18 @@ const findPair = async () => {
 
 //requesty
 const findGame = async (req,res) => {
-    if(!queue.hasOwnProperty(req.body["level"])){
-        queue[req.body["level"]] = [];
+    const u = await User.findOne({
+        "username": req.user["username"]
+    });
+    if(!queue.hasOwnProperty(u["level"])){
+        queue[u["level"]] = [];
     }
     let obj = {
-        "username": req.body["username"],
-        "level": req.body["level"],
+        "username": u["username"],
+        "level": u["level"],
         "socketid": req.body["socketid"]
     };
-    queue[req.body["level"]].push(obj);
+    queue[u["level"]].push(obj);
     return res.send({message: "Dodano cię do kolejki oczekiwania na grę"});
 }
 

@@ -5,7 +5,6 @@ const io = require("socket.io")(5050,{
 });
 
 io.on("connection", socket => {
-    console.log("someone connected");
     socket.on("join-room", data => {
         socket.join(data);
     });

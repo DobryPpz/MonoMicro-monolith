@@ -41,7 +41,9 @@ const createRoom = async (player1,player2) => {
         player2socket);
     const gameRoom = new Room(roomPlayer1,roomPlayer2,roomId);
     const interval = setInterval(gameRoom.update,0);
+    const spawnInterval = setInterval(gameRoom.spawnAdder,10000);
     gameRoom.intervalid = interval;
+    gameRoom.spawnAddersId = spawnInterval;
     rooms[roomId] = gameRoom;
     io.to(player1socket).emit("room-ready",roomId);
     io.to(player2socket).emit("room-ready",roomId);
@@ -70,12 +72,18 @@ const findGame = async (req,res) => {
     return res.send({message: "Dodano cię do kolejki oczekiwania na grę"});
 }
 
-const declareWinner = async (req,res) => {
-
+const declareWinner = async (player) => {
+    const u = await User.findOne({username: player});
+    u["level"]++;
+    await u.save();
 }
 
-const declareLoser = async (req,res) => {
-
+const declareLoser = async (player) => {
+    const u = await User.findOne({username: player});
+    if(u["level"] > 1){
+        u["level"]--;
+    }
+    await u.save();
 }
 
 setInterval(findPair,0);

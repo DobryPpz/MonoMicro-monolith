@@ -5,9 +5,8 @@ const Player = require("../classes/player");
 const uniqid = require("uniqid");
 const socketServer = require("./socketserver");
 const io = socketServer.io;
-
-const rooms = {};
-const queue = {};
+const rooms = socketServer.rooms;
+const queue = socketServer.queue;
 
 const createRoom = async (player1,player2) => {
     const roomId = uniqid();
@@ -47,6 +46,7 @@ const createRoom = async (player1,player2) => {
     rooms[roomId] = gameRoom;
     io.to(player1socket).emit("room-ready",roomId);
     io.to(player2socket).emit("room-ready",roomId);
+    console.log("room created");
 }
 
 const findPair = () => {
@@ -72,29 +72,11 @@ const findGame = async (req,res) => {
         "socketid": req.body["socketid"]
     };
     queue[u["level"]].push(obj);
-    return res.send({message: "Dodano cię do kolejki oczekiwania na grę"});
-}
-
-const declareWinner = async (player) => {
-    const u = await User.findOne({username: player});
-    u["level"]++;
-    await u.save();
-}
-
-const declareLoser = async (player) => {
-    const u = await User.findOne({username: player});
-    if(u["level"] > 1){
-        u["level"]--;
-    }
-    await u.save();
+    return res.send(u);
 }
 
 setInterval(findPair,0);
 
 module.exports = {
-    findGame,
-    declareWinner,
-    declareLoser,
-    rooms,
-    queue
+    findGame
 }

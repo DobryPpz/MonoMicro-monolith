@@ -4,9 +4,22 @@ const io = require("socket.io")(5050,{
     }
 });
 
+const rooms = {};
+const queue = {};
+
 io.on("connection", socket => {
+    console.log(socket.id);
+    socket.on("player-fire", data => {
+        rooms[data["code"]].playerFireEvent(data);
+    });
+    socket.on("player-rotate", data => {
+
+    });
+    socket.on("player-move", data => {
+        rooms[data["code"]].playerMoveEvent(data);
+    });
     socket.on("join-room", data => {
-        socket.join(data);
+        //socket.join(data);
     });
     socket.on("leave-room", data => {
         socket.leave(data);
@@ -14,5 +27,7 @@ io.on("connection", socket => {
 });
 
 module.exports = {
-    io
+    io,
+    rooms,
+    queue
 }

@@ -1,6 +1,10 @@
-const gamecontrollers = require("../controllers/gamecontrollers");
+const db = require("../models/index");
+const User = db.user;
 const socketServer = require("../controllers/socketserver");
 const io = socketServer.io;
+const rooms = socketServer.rooms;
+
+console.log(io);
 
 class Room{
     constructor(player1,player2,code){
@@ -13,43 +17,50 @@ class Room{
         this.armorAdders = [];
         this.intervalid = undefined;
         this.spawnAddersId = undefined;
-        io.on("connection", socket => {
-            console.log(socket.id);
-            socket.on("player-move",data => {
-                if(data.code == this.code){
-                    if(data["username"] == this.player1["username"]){
-                        this.player1.x = data["x"];
-                        this.player1.y = data["y"];
-                    }
-                    if(data["username"] == this.player2["username"]){
-                        this.player2.x = data["x"];
-                        this.player2.y = data["y"];
-                    }
-                }
-            });
-            socket.on("player-rotate", data => {
-                if(data.code == this.code){
-                    if(data["username"] == this.player1["username"]){
-                        this.player1.rotation = data["rotation"];
-                    }
-                    if(data["username"] == this.player2["username"]){
-                        this.player2.rotation = data["rotation"];
-                    }
-                }
-            });
-            socket.on("player-fire", data => {
-                if(data.code == this.code){
-                    if(data["username"] == this.player1["username"]){
-                        this.bullets1.push(data["bullet"]);
-                    }
-                    if(data["username"] == this.player2["username"]){
-                        this.bullets2.push(data["bullet"]);
-                    }
-                }
-            });
-        });
+        this.sendUpdateEvent();
     }
-    async spawnAdder(){
+    declareWinner = async (player) => {
+        const u = await User.findOne({username: player});
+        u["level"]++;
+        await u.save();
+    }
+    declareLoser = async (player) => {
+        const u = await User.findOne({username: player});
+        if(u["level"] > 1){
+            u["level"]--;
+        }
+        await u.save();
+    }
+    playerMoveEvent = (data) => {
+        if(data["username"] == this.player1["username"]){
+            this.player1.x = data["x"];
+            this.player1.y = data["y"];
+        }
+        if(data["username"] == this.player2["username"]){
+            this.player2.x = data["x"];
+            this.player2.y = data["y"];
+        }
+        this.sendUpdateEvent();
+    }
+    playerRotateEvent = (data) => {
+        if(data["username"] == this.player1["username"]){
+            this.player1.rotation = data["rotation"];
+        }
+        if(data["username"] == this.player2["username"]){
+            this.player2.rotation = data["rotation"];
+        }
+        this.sendUpdateEvent();
+    }
+    playerFireEvent = (data) => {
+        if(data["username"] == this.player1["username"]){
+            this.bullets1.push(data["bullet"]);
+        }
+        if(data["username"] == this.player2["username"]){
+            this.bullets2.push(data["bullet"]);
+        }
+        this.sendUpdateEvent();
+    }
+    spawnAdder = async () => {
         if(Math.random()<0.5){
             this.hpAdders.push({
                 x: 20+Math.floor(Math.random()*600),
@@ -66,62 +77,149 @@ class Room{
                 dy: -5+Math.floor(Math.random()*10) 
             });
         }
+        this.sendUpdateEvent();
     }
-    async update(){
+    sendUpdateEvent = async () => {
+        io.to(this.player1["socketid"]).emit("update",{
+            "player1": {
+                "x": this.player1.x,
+                "y": this.player1.y,
+                "hp": this.player1.hp,
+                "armor": this.player1.armor,
+                "username": this.player1.username,
+                "skincolor": this.player1.skincolor,
+                "bulletcolor": this.player1.bulletcolor,
+                "shootsound": this.player1.shootsound,
+                "deathsound": this.player1.deathsound,
+                "rotation": this.player1.rotation
+            },
+            "player2": {
+                "x": this.player2.x,
+                "y": this.player2.y,
+                "hp": this.player2.hp,
+                "armor": this.player2.armor,
+                "username": this.player2.username,
+                "skincolor": this.player2.skincolor,
+                "bulletcolor": this.player2.bulletcolor,
+                "shootsound": this.player2.shootsound,
+                "deathsound": this.player2.deathsound,
+                "rotation": this.player2.rotation
+            },
+            "code": this.code,
+            "bullets1": this.bullets1,
+            "bullets2": this.bullets2,
+            "hpAdders": this.hpAdders,
+            "armorAdders": this.armorAdders
+        });
+        io.to(this.player2["socketid"]).emit("update",{
+            "player1": {
+                "x": this.player1.x,
+                "y": this.player1.y,
+                "hp": this.player1.hp,
+                "armor": this.player1.armor,
+                "username": this.player1.username,
+                "skincolor": this.player1.skincolor,
+                "bulletcolor": this.player1.bulletcolor,
+                "shootsound": this.player1.shootsound,
+                "deathsound": this.player1.deathsound,
+                "rotation": this.player1.rotation
+            },
+            "player2": {
+                "x": this.player2.x,
+                "y": this.player2.y,
+                "hp": this.player2.hp,
+                "armor": this.player2.armor,
+                "username": this.player2.username,
+                "skincolor": this.player2.skincolor,
+                "bulletcolor": this.player2.bulletcolor,
+                "shootsound": this.player2.shootsound,
+                "deathsound": this.player2.deathsound,
+                "rotation": this.player2.rotation
+            },
+            "code": this.code,
+            "bullets1": this.bullets1,
+            "bullets2": this.bullets2,
+            "hpAdders": this.hpAdders,
+            "armorAdders": this.armorAdders
+        });
+    }
+    update = async () => {
         for(let b of this.bullets1){
             b.x += b.dx;
             b.y += b.dy;
+            this.sendUpdateEvent();
         }
         for(let b of this.bullets2){
             b.x += b.dx;
             b.y += b.dy;
+            this.sendUpdateEvent();
         }
-        for(let h of this.hpAdders){
-            h.x += h.dx;
-            h.y += h.dy;
-        }
-        for(let a of this.armorAdders){
-            a.x += a.dx;
-            a.y += a.dy;
-        }
+        // for(let h of this.hpAdders){
+        //     h.x += h.dx;
+        //     h.y += h.dy;
+        //     console.log("update 3");
+        //     this.sendUpdateEvent();
+        // }
+        // for(let a of this.armorAdders){
+        //     a.x += a.dx;
+        //     a.y += a.dy;
+        //     console.log("update 4");
+        //     this.sendUpdateEvent();
+        // }
         for(let h of this.hpAdders){
             if(Math.sqrt((h.x-this.player1.x)**2+(h.y-this.player1.y)**2) <= 20){
                 this.player1.hp = Math.min(this.player1.hp+40,500);
+                this.hpAdders.splice(this.hpAdders.indexOf(h),1);
+                this.sendUpdateEvent();
             }
             if(Math.sqrt((h.x-this.player2.x)**2+(h.y-this.player2.y)**2) <= 20){
                 this.player2.hp = Math.min(this.player2.hp+40,500);
+                this.hpAdders.splice(this.hpAdders.indexOf(h),1);
+                this.sendUpdateEvent();
             }
             if(h.x <= 0){
                 h.dx *= -1;
+                this.sendUpdateEvent();
             }
             if(h.x >= 800){
                 h.dx *= -1;
+                this.sendUpdateEvent();
             }
             if(h.y <= 0){
                 h.dy *= -1;
+                this.sendUpdateEvent();
             }
             if(h.y >= 600){
                 h.dy *= -1;
+                this.sendUpdateEvent();
             }
         }
         for(let a of this.armorAdders){
             if(Math.sqrt((a.x-this.player1.x)**2+(a.y-this.player1.y)**2) <= 20){
                 this.player1.armor = Math.min(this.player1.armor+20,100);
+                this.armorAdders.splice(this.armorAdders.indexOf(a),1);
+                this.sendUpdateEvent();
             }
             if(Math.sqrt((a.x-this.player2.x)**2+(a.y-this.player2.y)**2) <= 20){
                 this.player2.armor = Math.min(this.player2.armor+20,100);
+                this.armorAdders.splice(this.armorAdders.indexOf(a),1);
+                this.sendUpdateEvent();
             }
             if(a.x <= 0){
                 a.dx *= -1;
+                this.sendUpdateEvent();
             }
             if(a.x >= 800){
                 a.dx *= -1;
+                this.sendUpdateEvent();
             }
             if(a.y <= 0){
                 a.dy *= -1;
+                this.sendUpdateEvent();
             }
             if(a.y >= 600){
                 a.dy *= -1;
+                this.sendUpdateEvent();
             }
         }
         for(let b of this.bullets1){
@@ -135,18 +233,20 @@ class Room{
                     this.player2.hp -= (20-this.player2.armor);
                     this.player2.armor = 0;
                 }
+                this.sendUpdateEvent();
                 if(this.player2.hp <= 0){
-                    await gamecontrollers.declareWinner(this.player1["username"]);
-                    await gamecontrollers.declareLoser(this.player2["username"]);
+                    await this.declareWinner(this.player1["username"]);
+                    await this.declareLoser(this.player2["username"]);
                     clearInterval(this.intervalid);
                     clearInterval(this.spawnAddersId);
-                    delete gamecontrollers.rooms[this.code];
+                    delete rooms[this.code];
                     io.to(this.player1.socketid).emit("end-game", this.code);
                     io.to(this.player2.socketid).emit("end-game", this.code);
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){
                 this.bullets1.splice(this.bullets1.indexOf(b),1);
+                this.sendUpdateEvent();
             }
         }
         for(let b of this.bullets2){
@@ -160,53 +260,22 @@ class Room{
                     this.player1.hp -= (20-this.player1.armor);
                     this.player1.armor = 0;
                 }
+                this.sendUpdateEvent();
                 if(this.player1.hp <= 0){
-                    await gamecontrollers.declareWinner(this.player2["username"]);
-                    await gamecontrollers.declareLoser(this.player1["username"]);
+                    await this.declareWinner(this.player2["username"]);
+                    await this.declareLoser(this.player1["username"]);
                     clearInterval(this.intervalid);
                     clearInterval(this.spawnAddersId);
-                    delete gamecontrollers.rooms[this.code];
+                    delete rooms[this.code];
                     io.to(this.player1.socketid).emit("end-game", this.code);
                     io.to(this.player2.socketid).emit("end-game", this.code);
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){
                 this.bullets2.splice(this.bullets2.indexOf(b),1);
+                this.sendUpdateEvent();
             }
         }
-        io.to(this.code).emit("update",{
-            "player1": {
-                "x": this.player1.x,
-                "y": this.player1.y,
-                "hp": this.player1.hp,
-                "armor": this.player1.armor,
-                "username": this.player1.username,
-                "skincolor": this.player1.skincolor,
-                "bulletcolor": this.player1.bulletcolor,
-                "shootsound": this.player1.shootsound,
-                "deathsound": this.player1.deathsound,
-                "socketid": this.player1.socketid,
-                "rotation": this.player1.rotation
-            },
-            "player2": {
-                "x": this.player2.x,
-                "y": this.player2.y,
-                "hp": this.player2.hp,
-                "armor": this.player2.armor,
-                "username": this.player2.username,
-                "skincolor": this.player2.skincolor,
-                "bulletcolor": this.player2.bulletcolor,
-                "shootsound": this.player2.shootsound,
-                "deathsound": this.player2.deathsound,
-                "socketid": this.player2.socketid,
-                "rotation": this.player2.rotation
-            },
-            "code": this.code,
-            "bullets1": this.bullets1,
-            "bullets2": this.bullets2,
-            "hpAdders": this.hpAdders,
-            "armorAdders": this.armorAdders
-        });
     }
 }
 

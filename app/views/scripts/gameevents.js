@@ -70,7 +70,7 @@ function moveEvent(e){
 
 function exitEvent(e){
     if(e.key == "x"){
-        socket.emit("leave-room",roomId);
+        socket.emit("leave-room",gameData["code"]);
         clearEvents();
         fetch("http://localhost:8000/menu",{
             method: "GET",
@@ -106,12 +106,24 @@ function getData(data){
     gameData["hpAdders"] = data["hpAdders"];
     gameData["armorAdders"] = data["armorAdders"];
     if(data["player1"]["username"] == username){
-        shootSound.src = data["player1"]["shootsound"];
-        deathSound.src = data["player1"]["deathsound"];
+        if(!shootSound.src){
+            shootSound.src = data["player1"]["shootsound"];
+            shootSound.play();
+        }
+        if(!deathSound.src){
+            deathSound.src = data["player1"]["deathsound"];
+            deathSound.play();
+        }
     }
     else{
-        shootSound.src = data["player2"]["shootsound"];
-        deathSound.src = data["player2"]["deathsound"];
+        if(!shootSound.src){
+            shootSound.src = data["player2"]["shootsound"];
+            shootSound.play();
+        }
+        if(!deathSound.src){
+            deathSound.src = data["player2"]["deathsound"];
+            deathSound.play();
+        }
     }
 }
 
@@ -133,7 +145,6 @@ export async function gameEvent(e){
         position.y <= canvas.height/4-buttonHeight){
         clearEverything();
         getCanvasData();
-        console.log("jesteśmy w grze");
         canvas.style.backgroundColor = "black";
         await fetch("http://localhost:8000/game",{
             method: "POST",
@@ -150,11 +161,9 @@ export async function gameEvent(e){
         })
         .then(data => {
             username = data["username"];
-            console.log(username);
         });
         socket.on("room-ready", roomId => {
             socket.emit("join-room",roomId);
-            console.log("dołączyłeś do pokoju");
             canvas.addEventListener("click",shootEvent);
             canvas.addEventListener("mousemove",rotateEvent);
             window.addEventListener("keydown",moveEvent);
@@ -181,7 +190,6 @@ export async function gameEvent(e){
             });
         });
         socket.on("update", data => {
-            console.log("odbieramy update event");
             getData(data);
             drawGame();
         });

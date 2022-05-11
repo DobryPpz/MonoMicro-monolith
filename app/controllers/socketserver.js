@@ -19,7 +19,7 @@ io.on("connection", socket => {
         rooms[data["code"]].playerMoveEvent(data);
     });
     socket.on("join-room", data => {
-        //socket.join(data);
+        socket.join(data);
     });
     socket.on("leave-room", data => {
         socket.leave(data);

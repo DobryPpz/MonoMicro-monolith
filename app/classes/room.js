@@ -17,7 +17,13 @@ class Room{
         this.armorAdders = [];
         this.intervalid = undefined;
         this.spawnAddersId = undefined;
+        this.numberOfPlayers = 2;
         this.sendUpdateEvent();
+    }
+    closeRoom = () => {
+        clearInterval(this.intervalid);
+        clearInterval(this.spawnAddersId);
+        delete rooms[this.code];
     }
     declareWinner = async (player) => {
         const u = await User.findOne({username: player});
@@ -39,15 +45,6 @@ class Room{
         if(data["username"] == this.player2["username"]){
             this.player2.x = data["x"];
             this.player2.y = data["y"];
-        }
-        this.sendUpdateEvent();
-    }
-    playerRotateEvent = (data) => {
-        if(data["username"] == this.player1["username"]){
-            this.player1.rotation = data["rotation"];
-        }
-        if(data["username"] == this.player2["username"]){
-            this.player2.rotation = data["rotation"];
         }
         this.sendUpdateEvent();
     }
@@ -154,25 +151,13 @@ class Room{
             b.y += b.dy;
             this.sendUpdateEvent();
         }
-        // for(let h of this.hpAdders){
-        //     h.x += h.dx;
-        //     h.y += h.dy;
-        //     console.log("update 3");
-        //     this.sendUpdateEvent();
-        // }
-        // for(let a of this.armorAdders){
-        //     a.x += a.dx;
-        //     a.y += a.dy;
-        //     console.log("update 4");
-        //     this.sendUpdateEvent();
-        // }
         for(let h of this.hpAdders){
-            if(Math.sqrt((h.x-this.player1.x)**2+(h.y-this.player1.y)**2) <= 20){
+            if(Math.sqrt((h.x-this.player1.x)**2+(h.y-this.player1.y)**2) <= 40){
                 this.player1.hp = Math.min(this.player1.hp+40,500);
                 this.hpAdders.splice(this.hpAdders.indexOf(h),1);
                 this.sendUpdateEvent();
             }
-            if(Math.sqrt((h.x-this.player2.x)**2+(h.y-this.player2.y)**2) <= 20){
+            if(Math.sqrt((h.x-this.player2.x)**2+(h.y-this.player2.y)**2) <= 40){
                 this.player2.hp = Math.min(this.player2.hp+40,500);
                 this.hpAdders.splice(this.hpAdders.indexOf(h),1);
                 this.sendUpdateEvent();

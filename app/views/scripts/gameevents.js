@@ -6,6 +6,12 @@ let shootSound = document.createElement("audio");
 shootSound.setAttribute("preload","auto");
 let deathSound = document.createElement("audio");
 deathSound.setAttribute("preload","auto");
+let armorAdderImg = new Image();
+armorAdderImg.onload = "sth";
+armorAdderImg.src = "armoradder.png";
+let hpAdderImg = new Image();
+hpAdderImg.onload = "sth";
+hpAdderImg.src = "hpadder.png";
 let username;
 let gameData = {};
 let players = {};
@@ -17,6 +23,7 @@ function shootEvent(e){
         "code": gameData["code"],
         "username": username,
         "bullet": {
+            "username": username,
             x: players[username]["x"],
             y: players[username]["y"],
             dx: (position.x-players[username]["x"])*factor,
@@ -25,10 +32,6 @@ function shootEvent(e){
     };
     shootSound.play();
     socket.emit("player-fire",data);
-}
-
-function rotateEvent(e){
-    
 }
 
 function moveEvent(e){
@@ -70,6 +73,7 @@ function moveEvent(e){
 
 function exitEvent(e){
     if(e.key == "x"){
+        socket.off();
         socket.emit("leave-room",gameData["code"]);
         clearEvents();
         fetch("http://localhost:8000/menu",{
@@ -92,7 +96,6 @@ function exitEvent(e){
 
 function clearEvents(){
     canvas.removeEventListener("click",shootEvent);
-    canvas.removeEventListener("mousemove",rotateEvent);
     window.removeEventListener("keydown",moveEvent);
     window.removeEventListener("keydown",exitEvent);
 }
@@ -108,32 +111,59 @@ function getData(data){
     if(data["player1"]["username"] == username){
         if(!shootSound.src){
             shootSound.src = data["player1"]["shootsound"];
-            shootSound.play();
         }
         if(!deathSound.src){
             deathSound.src = data["player1"]["deathsound"];
-            deathSound.play();
         }
     }
     else{
         if(!shootSound.src){
             shootSound.src = data["player2"]["shootsound"];
-            shootSound.play();
         }
         if(!deathSound.src){
             deathSound.src = data["player2"]["deathsound"];
-            deathSound.play();
         }
     }
 }
 
 function drawGame(){
     context.clearRect(0,0,800,600);
+    context.fillStyle = "white";
+    context.font = "20px Arial";
+    context.fillText(`HP: ${players[username]["hp"]}    ARMOR: ${players[username]["armor"]}`,10,25);
     for(let p in players){
         context.beginPath();
-        context.fillStyle = "white";
+        context.fillStyle = players[p]["skincolor"];
         context.arc(players[p]["x"],players[p]["y"],20,0,2*Math.PI);
         context.fill();
+    }
+    for(let b of gameData["bullets1"]){
+        for(let p in players){
+            if(b["username"] == players[p]["username"]){
+                context.beginPath();
+                context.fillStyle = players[p]["bulletcolor"]
+                context.arc(b["x"],b["y"],5,0,2*Math.PI);
+                context.fill();
+                break;
+            }
+        }
+    }
+    for(let b of gameData["bullets2"]){
+        for(let p in players){
+            if(b["username"] == players[p]["username"]){
+                context.beginPath();
+                context.fillStyle = players[p]["bulletcolor"]
+                context.arc(b["x"],b["y"],5,0,2*Math.PI);
+                context.fill();
+                break;
+            }
+        }
+    }
+    for(let i=0;i<gameData["hpAdders"].length;i++){
+        context.drawImage(hpAdderImg,gameData["hpAdders"][i]["x"]-20,gameData["hpAdders"][i]["y"]-20);
+    }
+    for(let i=0;i<gameData["armorAdders"].length;i++){
+        context.drawImage(armorAdderImg,gameData["armorAdders"][i]["x"]-20,gameData["armorAdders"][i]["y"]-20);
     }
 }
 
@@ -165,7 +195,6 @@ export async function gameEvent(e){
         socket.on("room-ready", roomId => {
             socket.emit("join-room",roomId);
             canvas.addEventListener("click",shootEvent);
-            canvas.addEventListener("mousemove",rotateEvent);
             window.addEventListener("keydown",moveEvent);
             window.addEventListener("keydown",exitEvent);
         });

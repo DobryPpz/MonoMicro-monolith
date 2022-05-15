@@ -222,9 +222,7 @@ class Room{
                 if(this.player2.hp <= 0){
                     await this.declareWinner(this.player1["username"]);
                     await this.declareLoser(this.player2["username"]);
-                    clearInterval(this.intervalid);
-                    clearInterval(this.spawnAddersId);
-                    delete rooms[this.code];
+                    this.closeRoom();
                     io.to(this.player1.socketid).emit("end-game", this.code);
                     io.to(this.player2.socketid).emit("end-game", this.code);
                 }

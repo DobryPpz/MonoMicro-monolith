@@ -20,10 +20,9 @@ io.on("connection", socket => {
     });
     socket.on("leave-room", data => {
         console.log("leave-room acquired");
-        rooms[data].numberOfPlayers--;
-        if(rooms[data].numberOfPlayers == 0){
+        if(rooms[data]) rooms[data].numberOfPlayers--;
+        if(rooms[data] && rooms[data].numberOfPlayers == 0){
             rooms[data].closeRoom();
-            delete rooms[data];
         }
         socket.leave(data);
     });

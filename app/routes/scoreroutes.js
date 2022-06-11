@@ -18,7 +18,7 @@ router.get("/decreasing", async (req,res) => {
             "level": u["level"]
         };
     });
-    return res.send(users);
+    return res.send(users).end();
 });
 
 router.get("/increasing",async (req,res) => {

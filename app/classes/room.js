@@ -1,10 +1,6 @@
 const db = require("../models/index");
 const User = db.user;
 const socketServer = require("../controllers/socketserver");
-const io = socketServer.io;
-const rooms = socketServer.rooms;
-
-console.log(io);
 
 class Room{
     constructor(player1,player2,code){
@@ -21,8 +17,12 @@ class Room{
         this.sendUpdateEvent();
     }
     closeRoom = () => {
+        const io = socketServer.getIo();
+        const rooms = socketServer.rooms;
         clearInterval(this.intervalid);
         clearInterval(this.spawnAddersId);
+        io.to(this.player1.socketid).emit("end-game", this.code);
+        io.to(this.player2.socketid).emit("end-game", this.code);
         delete rooms[this.code];
     }
     declareWinner = async (player) => {
@@ -76,7 +76,8 @@ class Room{
         }
         this.sendUpdateEvent();
     }
-    sendUpdateEvent = async () => {
+    sendUpdateEvent = () => {
+        const io = socketServer.getIo();
         io.to(this.player1["socketid"]).emit("update",{
             "player1": {
                 "x": this.player1.x,
@@ -141,6 +142,8 @@ class Room{
         });
     }
     update = async () => {
+        const io = socketServer.getIo();
+        const rooms = socketServer.rooms;
         for(let b of this.bullets1){
             b.x += b.dx;
             b.y += b.dy;
@@ -223,8 +226,6 @@ class Room{
                     await this.declareWinner(this.player1["username"]);
                     await this.declareLoser(this.player2["username"]);
                     this.closeRoom();
-                    io.to(this.player1.socketid).emit("end-game", this.code);
-                    io.to(this.player2.socketid).emit("end-game", this.code);
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){
@@ -247,11 +248,7 @@ class Room{
                 if(this.player1.hp <= 0){
                     await this.declareWinner(this.player2["username"]);
                     await this.declareLoser(this.player1["username"]);
-                    clearInterval(this.intervalid);
-                    clearInterval(this.spawnAddersId);
-                    delete rooms[this.code];
-                    io.to(this.player1.socketid).emit("end-game", this.code);
-                    io.to(this.player2.socketid).emit("end-game", this.code);
+                    this.closeRoom();
                 }
             }
             if(b.x <= 0 || b.x >= 800 || b.y <= 0 || b.y >= 600){

@@ -1,6 +1,7 @@
 import { canvas, context, getCanvasData, token } from "./script.js";
 import { buttonWidth, buttonHeight, drawMenu } from "./scenes.js";
 import { getMousePosition } from "./menuevents.js";
+import { SERVER_IP } from "./constants.js";
 
 export function settingsEvent(e){
     let position = getMousePosition(e);
@@ -8,7 +9,7 @@ export function settingsEvent(e){
     position.x <= canvas.width/2+buttonWidth/2 &&
     position.y >= 2*canvas.height/4-2*buttonHeight &&
     position.y <= 2*canvas.height/4-buttonHeight){
-        fetch("http://localhost:8000/settings",{
+        fetch(`${SERVER_IP}/settings`,{
             method: "GET",
             headers: {
                 "x-access-token": token
@@ -23,7 +24,7 @@ export function settingsEvent(e){
             const saveButton = document.getElementById("save");
             const returnButton = document.getElementById("goback");
             returnButton.addEventListener("click",e => {
-                fetch("http://localhost:8000/menu",{
+                fetch(`${SERVER_IP}/menu`,{
                     method: "GET",
                     headers: {
                         "x-access-token": token
@@ -69,7 +70,7 @@ export function settingsEvent(e){
                         break;
                     }
                 }
-                fetch("http://localhost:8000/settings/save",{
+                fetch(`${SERVER_IP}/settings/save`,{
                     method: "POST",
                     headers: {
                         "x-access-token": token,

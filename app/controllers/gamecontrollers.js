@@ -3,15 +3,14 @@ const User = db.user;
 const Room = require("../classes/room");
 const Player = require("../classes/player");
 const uniqid = require("uniqid");
-const socketServer = require("./socketserver");
-const io = socketServer.io;
-const rooms = socketServer.rooms;
-const queue = socketServer.queue;
+const socketServer = require("../controllers/socketserver");
 
 const createRoom = async (player1,player2) => {
     const roomId = uniqid();
     const player1socket = player1["socketid"];
     const player2socket = player2["socketid"];
+    const io = socketServer.getIo();
+    const rooms = socketServer.rooms;
     player1 = await User.findOne({
         "username": player1["username"]
     });
@@ -50,16 +49,20 @@ const createRoom = async (player1,player2) => {
 }
 
 const findPair = () => {
+    const queue = socketServer.queue;
     for(let q in queue){
         if(queue[q].length >= 2){
             let pair = queue[q].splice(0,2);
-            createRoom(pair[0],pair[1]);
+            if(pair[0]["username"] != pair[1]["username"]){
+                createRoom(pair[0],pair[1]);
+            }
         }
     }
 }
 
 //requesty
 const findGame = async (req,res) => {
+    const queue = socketServer.queue;
     const u = await User.findOne({
         "username": req.user["username"]
     });
@@ -72,10 +75,11 @@ const findGame = async (req,res) => {
         "socketid": req.body["socketid"]
     };
     queue[u["level"]].push(obj);
+    findPair();
     return res.send(u);
 }
 
-setInterval(findPair,0);
+//setInterval(findPair,0);
 
 module.exports = {
     findGame

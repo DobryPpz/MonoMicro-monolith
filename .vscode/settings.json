@@ -1,0 +1,5 @@
+{
+    "appService.showBuildDuringDeployPrompt": false,
+    "appService.defaultWebAppToDeploy": "/subscriptions/8d6ee11a-2905-44ea-9c3d-72c00fe9c34f/resourceGroups/DefaultResourceGroup-DEWC/providers/Microsoft.Web/sites/monomicro-monolith",
+    "appService.deploySubpath": "."
+}

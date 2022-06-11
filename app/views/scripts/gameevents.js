@@ -1,6 +1,7 @@
 import { canvas, context, token, getCanvasData, socket} from "./script.js";
 import { drawMenu, buttonWidth, buttonHeight, clearEverything } from "./scenes.js";
 import { getMousePosition } from "./menuevents.js";
+import { SERVER_IP } from "./constants.js"
 
 let shootSound = document.createElement("audio");
 shootSound.setAttribute("preload","auto");
@@ -76,7 +77,7 @@ function exitEvent(e){
         socket.off();
         socket.emit("leave-room",gameData["code"]);
         clearEvents();
-        fetch("http://localhost:8000/menu",{
+        fetch(`${SERVER_IP}/menu`,{
             method: "GET",
             headers: {
                 "x-access-token": token
@@ -176,7 +177,7 @@ export async function gameEvent(e){
         clearEverything();
         getCanvasData();
         canvas.style.backgroundColor = "black";
-        await fetch("http://localhost:8000/game",{
+        await fetch(`${SERVER_IP}/game`,{
             method: "POST",
             headers: {
                 "x-access-token": token,
@@ -202,7 +203,7 @@ export async function gameEvent(e){
             deathSound.play();
             socket.emit("leave-room",roomId);
             clearEvents();
-            fetch("http://localhost:8000/menu",{
+            fetch(`${SERVER_IP}/menu`,{
                 method: "GET",
                 headers: {
                     "x-access-token": token

@@ -11,9 +11,14 @@ const genToken = u => {
 
 const verifyToken = async (req,res,next) => {
     const header = req.headers["x-access-token"];
-    if(header){
+    if(header !== undefined){
+        console.log(header);
         jwt.verify(header,process.env.ACCESS_TOKEN_SECRET,(err,user) => {
-            if(err) return res.send({message: "You don't have access"});
+            if(err){
+                console.log(header);
+                console.log(err);
+                return res.send({message: "You don't have access"});   
+            }
             req.user = user;
             next();
         });

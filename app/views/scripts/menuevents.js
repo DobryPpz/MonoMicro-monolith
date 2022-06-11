@@ -1,5 +1,6 @@
 import { canvas, context, token, clearToken, setUpPage, getCanvasData } from "./script.js";
 import { buttonWidth, buttonHeight, clearEverything, drawMenu } from "./scenes.js";
+import { SERVER_IP } from "./constants.js";
 
 export function getMousePosition(e){
     let rect = canvas.getBoundingClientRect();
@@ -16,7 +17,7 @@ export function logoutEvent(e){
         position.y >= canvas.height-2*buttonHeight &&
         position.y <= canvas.height-buttonHeight){
         clearEverything();
-        fetch("http://localhost:8000/",{
+        fetch(`${SERVER_IP}`,{
             method: "GET"
         }).then(response => {
             return response.text()
@@ -38,7 +39,7 @@ export function scoreEvent(e){
         position.y >= 3*canvas.height/4-2*buttonHeight &&
         position.y <= 3*canvas.height/4-buttonHeight){
         clearEverything();
-        fetch("http://localhost:8000/score",{
+        fetch(`${SERVER_IP}/score`,{
             method: "GET",
             headers: {
                 "x-access-token": token
@@ -57,7 +58,7 @@ export function scoreEvent(e){
             const increasingButton = document.getElementById("increasingbutton");
             menuButton.addEventListener("click",e => {
                 clearEverything();
-                fetch("http://localhost:8000/menu",{
+                fetch(`${SERVER_IP}/menu`,{
                     method: "GET",
                     headers: {
                         "x-access-token": token
@@ -74,7 +75,7 @@ export function scoreEvent(e){
                 });
             });
             decreasingButton.addEventListener("click",e => {
-                fetch("http://localhost:8000/score/decreasing",{
+                fetch(`${SERVER_IP}/score/decreasing`,{
                     method: "GET",
                     headers: {
                         "x-access-token": token
@@ -93,7 +94,7 @@ export function scoreEvent(e){
                 });
             });
             playerScoreButton.addEventListener("click",e => {
-                fetch("http://localhost:8000/score/player",{
+                fetch(`${SERVER_IP}/score/player`,{
                     method: "GET",
                     headers: {
                         "x-access-token": token
@@ -110,7 +111,7 @@ export function scoreEvent(e){
                 });
             });
             increasingButton.addEventListener("click",e => {
-                fetch("http://localhost:8000/score/increasing",{
+                fetch(`${SERVER_IP}/score/increasing`,{
                     method: "GET",
                     headers: {
                         "x-access-token": token

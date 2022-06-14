@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname,"shootsounds")));
 app.use(express.static(path.join(__dirname,"skincolors")));
 
 db.mongoose.connect(process.env.DB_IP,() => {
-    console.log("connected to a database");
+    console.log(`connected to a database on address ${process.env.DB_IP}`);
 });
 
 app.get("/",(req,res) => {

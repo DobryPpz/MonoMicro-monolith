@@ -76,7 +76,7 @@ const findGame = async (req,res) => {
     };
     queue[u["level"]].push(obj);
     findPair();
-    return res.send(u);
+    return res.end(JSON.stringify(u));
 }
 
 //setInterval(findPair,0);

@@ -14,22 +14,15 @@ const socketServer = require("./controllers/socketserver");
 let io = socketServer.io;
 io = require("socket.io")(server,{
     cors: {
-        origin: ["https://monomicro-monolith.azurewebsites.net","http://localhost:8080"],
+        origin: ["http://localhost:8080"],
         methods: ["GET","POST"]
     }
 });
 socketServer.startServer(io);
 
 require("dotenv").config();
-require("ejs");
-
-app.set("view engine","ejs");
-app.set("views",path.join(__dirname,"views"));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-app.use(cors({
-    origin: "https://monomicro-monolith.azurewebsites.net:8080"
-}));
 app.use(express.static(path.join(__dirname,"..","grafika")));
 app.use(express.static(path.join(__dirname,"views","scripts")));
 app.use(express.static(path.join(__dirname,"styles")));
@@ -53,6 +46,3 @@ app.use("/auth",authRoutes);
 app.use("/game",authJwt.verifyToken,gameRoutes);
 app.use("/score",authJwt.verifyToken,scoreRoutes);
 app.use("/settings",authJwt.verifyToken,settingsRoutes);
-// app.listen(8080,() => {
-//     console.log("The app is running on port 8080");
-// });

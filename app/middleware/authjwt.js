@@ -17,14 +17,14 @@ const verifyToken = async (req,res,next) => {
             if(err){
                 console.log(header);
                 console.log(err);
-                return res.send({message: "You don't have access"});   
+                return res.end(JSON.stringify({message: "You don't have access"}));   
             }
             req.user = user;
             next();
         });
     }
     else{
-        return res.send({message: "Unauthorized!"});
+        return res.end(JSON.stringify({message: "Unauthorized!"}));
     }
 }
 

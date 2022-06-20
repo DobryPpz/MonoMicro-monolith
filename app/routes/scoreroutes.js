@@ -18,7 +18,7 @@ router.get("/decreasing", async (req,res) => {
             "level": u["level"]
         };
     });
-    return res.send(users).end();
+    return res.end(JSON.stringify(users));
 });
 
 router.get("/increasing",async (req,res) => {
@@ -31,7 +31,7 @@ router.get("/increasing",async (req,res) => {
            "level": u["level"]
        };
    });
-   return res.send(users);
+   return res.end(JSON.stringify(users));
 });
 
 router.get("/player", async (req,res) => {
@@ -40,10 +40,10 @@ router.get("/player", async (req,res) => {
     let player = req.user;
     for(let i=0;i<users.length;i++){
         if(users[i]["username"] == player["username"]){
-            return res.send({
+            return res.end(JSON.stringify({
                 "username": player["username"],
                 "rank": i+1
-            });
+            }));
         }
     }
 });

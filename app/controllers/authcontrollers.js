@@ -6,7 +6,7 @@ const authJwt = require("../middleware/authjwt");
 const signup = async (req,res) => {
     const u = await User.findOne({username: req.body.username});
     if(u){
-        return res.send({message: "Użytkownik o takiej nazwie już istnieje"});
+        return res.end(JSON.stringify({message: "Użytkownik o takiej nazwie już istnieje"}));
     }
     else{
         const hashedPassword = await bcrypt.hash(req.body.password,8);
@@ -20,7 +20,7 @@ const signup = async (req,res) => {
             shootsound: "shootsounddefault.wav"
         });
         await user.save();
-        return res.send({message: "Zarejestrowano pomyślnie"});
+        return res.end(JSON.stringify({message: "Zarejestrowano pomyślnie"}));
     }
 }
 
@@ -29,16 +29,16 @@ const signin = async (req,res) => {
     if(u){
         const isPasswordGood = bcrypt.compareSync(req.body.password,u.password);
         if(isPasswordGood){
-            return res.send({
+            return res.end(JSON.stringify({
                 "x-access-token" : authJwt.genToken(u)
-            });
+            }));
         }
         else{
-            return res.send({message: "Złe hasło"});
+            return res.end(JSON.stringify({message: "Złe hasło"}));
         }
     }
     else{
-        return res.send({message: "Nie ma użytkownika o takiej nazwie"});
+        return res.end(JSON.stringify({message: "Nie ma użytkownika o takiej nazwie"}));
     }
 }
 
